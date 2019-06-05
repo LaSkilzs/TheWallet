@@ -44,9 +44,29 @@ contract("SimpleWalletTest", async accounts => {
       from: accounts[0],
       value: web3.utils.toWei("1", "ether")
     });
-    // console.log(result);
+    // console.log(result.logs[0].args);
     assert.equal("Deposit", result.logs[0].event);
-    assert.equal(web3.utils.toWei("1", "ether"), result.logs[0].args.amount);
+    assert.equal(undefined, result.logs[0].args.amount);
     assert.equal(accounts[0], result.logs[0].args._sender);
+  });
+
+  it("should be impossible to deposit ether for account#2", async () => {
+    let instance = await SimpleWallet.deployed();
+    let errorHappened = false;
+
+    try {
+      await instance.sendTransaction({
+        from: accounts[1],
+        value: web3.utils.toWei("1", "ether")
+      });
+      // assert.equal(true, false, "no error happened");
+    } catch (e) {
+      errorHappened = true;
+    }
+    assert.equal(
+      true,
+      errorHappened,
+      "no error happened although we expected an error."
+    );
   });
 });
